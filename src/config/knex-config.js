@@ -1,6 +1,6 @@
-import knex from 'knex'
-import config from '../../knexfile.cjs'
+import knex from "knex";
+import config from "../../knexfile.cjs";
 
-const pg = knex(config.development)
+const pg = knex(config.development);
 
-export default pg
+export default pg;

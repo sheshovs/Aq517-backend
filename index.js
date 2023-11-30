@@ -1,64 +1,39 @@
-import express from "express"
-import cors from "cors"
+import express from "express";
+import cors from "cors";
 import axios from "axios";
-import routes from "./src/api/routes/index.js"
+import routes from "./src/api/routes/index.js";
+import http from 'http'
+import { Server } from 'socket.io'
 
-const app = express()
+export const socketsUser = []
+
+const app = express();
 
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 app.use(cors());
-app.use(routes)
+app.use(routes);
 
-
-app.post("/api/mercadopago/create_preference", async (req, res) => {
-
-  const mercadoPagoUrl = `https://api.mercadopago.com/checkout/preferences?access_token=TEST-5849597827836358-101417-23c615c14370e68bfa7a84053ea4e2c2-62109829`
-
-  const preferenceData = {
-		items: req.body.items,
-    auto_return: "approved",
-		back_urls: {
-			"success": "https://aq517.netlify.app/",
-			"failure": "https://aq517.netlify.app/",
-			"pending": "https://aq517.netlify.app/"
-		},
-	}
-
-  try {
-    const response = await axios.post(mercadoPagoUrl, preferenceData, {
-      headers: {
-        'Content-Type': 'application/json'
-      }
-    })
-    res.status(200).json({
-      url: response.data.init_point,
-    })
-  } catch (error) {
-    res.status(400).json(error)
-    console.log(error)
+const server = http.createServer(app)
+export const socketio = new Server(server, {
+  cors: {
+    origin: true,
+    methods: ['GET', 'POST'],
+    credentials: true
   }
-
-});
-
-
-app.get('/api/mercadopago/feedback', function (req, res) {
-	res.json({
-		Payment: req.query.payment_id,
-		Status: req.query.status,
-		MerchantOrder: req.query.merchant_order_id
-	});
-});
-
-
-
-
-app.get("/", (req, res) => {
-    res.send("Hello World!")
 })
 
-const PORT = process.env.PORT || 4000
-
-app.listen(PORT, () => {
-  console.log(`Servidor corriendo en el puerto: ${PORT}`)
+socketio.on('connection', (socket) => {
+  socketsUser.push(socket.id)
 })
+
+socketio.on('disconnect', (socket) => {
+  const index = socketsUser.indexOf(socket.id)
+  socketsUser.splice(index, 1)
+})
+
+const PORT = process.env.PORT || 4000;
+
+server.listen(PORT, () => {
+  console.log(`Servidor corriendo en el puerto: ${PORT}`);
+});

@@ -1,4 +1,4 @@
 export const EventStatuses = {
-  BLOCKED: 'BLOCKED',
-  SCHEDULED: 'SCHEDULED',
-}
+  BLOCKED: "BLOCKED",
+  SCHEDULED: "SCHEDULED",
+};
