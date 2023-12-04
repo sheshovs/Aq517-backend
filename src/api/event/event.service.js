@@ -60,7 +60,14 @@ const EventService = {
     } catch (error) {
       return error;
     }
-  }
+  },
+  getEventsByMonth: async (month) => {
+    try {
+      return await pg("Event").whereRaw(`to_char("date", 'YYYY-MM') = '${month}'`).select("*");
+    } catch (error) {
+      return error;
+    }
+  },
 };
 
 export default EventService;

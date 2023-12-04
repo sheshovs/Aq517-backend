@@ -1,14 +1,19 @@
 import axios from "axios";
 import MPService from "./mp.service.js";
-import { EventStatuses } from "../utils/constants.js";
+import { EventStatuses, OrderStatuses, mp_url } from "../utils/constants.js";
 import EventService from "../event/event.service.js";
+
+const access_token = process.env.MP_ACCESS_TOKEN;
+
+
 
 const MPController = {
   CreatePreference: async (req, res) => {
-    const mercadoPagoUrl = `https://api.mercadopago.com/checkout/preferences?access_token=TEST-5849597827836358-101417-23c615c14370e68bfa7a84053ea4e2c2-62109829`;
+    const { attendant, email, phone, items } = req.body;
+    const mercadoPagoUrl = `${mp_url}checkout/preferences?access_token=${access_token}`;
   
     const preferenceData = {
-      items: req.body.items,
+      items: items,
       auto_return: "approved",
       back_urls: {
         success: `${process.env.APP_URL}/`,
@@ -30,10 +35,14 @@ const MPController = {
         total_price += item.unit_price
         eventIds.push(item.id)
       })
-      
+
       const payload = {
         uuid: response.data.id,
         total_price,
+        status: OrderStatuses.PENDING,
+        attendant,
+        email,
+        phone,
         createdAt: new Date(),
       }
       
@@ -59,9 +68,30 @@ const MPController = {
   },
   UpdateEvents: async (req, res) => {
     const { preferenceId } = req.body;
+    const { status, paymentId } = req.query;
     
     if(!preferenceId) {
       return res.status(400).json({ message: "No se recibió el id de la preferencia" });
+    }
+
+    const isInProcess = status === "in_process"
+
+    const orderPayload = isInProcess ? {
+      status: OrderStatuses.PENDING,
+      paymentId,
+    }: {
+      status: OrderStatuses.APPROVED,
+      paymentId,
+    }
+
+    const updateOrder = await MPService.updateOrder(preferenceId, orderPayload)
+
+    if(!updateOrder) {
+      return res.status(400).json({ message: "Error actualizando orden" });
+    }
+
+    if (isInProcess) {
+      return res.status(200).json({ message: "Pago en proceso" });
     }
 
     const itemsByOrder = await MPService.getItemsByOrder(preferenceId)
@@ -93,7 +123,41 @@ const MPController = {
         .json({ message: "Error actualizando eventos" });
     }
 
-    return res.status(200).json({ message: "Eventos actualizados correctamente" });
+    return res.status(200).json({ message: "Pago realizado correctamente" });
+  },
+  DeleteEvents: async (req, res) => {
+    const { preferenceId } = req.params;
+    const { status } = req.query;
+
+    if(!preferenceId) {
+      return res.status(400).json({ message: "No se recibió el id de la preferencia" });
+    }
+
+    const orderPayload = {
+      status: status === "null" ? OrderStatuses.FAILURE : OrderStatuses.REJECTED,
+    }
+
+    const updateOrder = await MPService.updateOrder(preferenceId, orderPayload)
+
+    if(!updateOrder) {
+      return res.status(400).json({ message: "Error actualizando orden" });
+    }
+
+    const itemsByOrder = await MPService.getItemsByOrder(preferenceId)
+
+    if(!itemsByOrder) {
+      return res.status(400).json({ message: "Error obteniendo items de la preferencia" });
+    }
+
+    if(itemsByOrder.length === 0) {
+      return res.status(200).json({ message: "Pago cancelado" });
+    }
+
+    const eventIds = itemsByOrder.map((item) => item.uuid)
+
+    await EventService.deleteEvents(eventIds);
+
+    return res.status(200).json({ message: "Pago cancelado" });
   }
 };
 

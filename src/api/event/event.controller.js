@@ -138,6 +138,25 @@ const EventController = {
 
     return res.status(StatusCodes.OK).json(events);
   },
+  GetEventsByMonth: async (req, res) => {
+    const { month } = req.query;
+
+    if (!month) {
+      return res
+        .status(StatusCodes.BAD_REQUEST)
+        .json({ message: "No hay mes para buscar eventos" });
+    }
+
+    const events = await EventService.getEventsByMonth(month);
+
+    if (!events) {
+      return res
+        .status(StatusCodes.INTERNAL_SERVER_ERROR)
+        .json({ events: [] });
+    }
+
+    return res.status(StatusCodes.OK).json(events);
+  }
 };
 
 export default EventController;

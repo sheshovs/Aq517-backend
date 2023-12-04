@@ -4,14 +4,16 @@ import axios from "axios";
 import routes from "./src/api/routes/index.js";
 import http from 'http'
 import { Server } from 'socket.io'
+import isValidUser from "./src/api/middleware/isValidUser.js";
 
 export const socketsUser = []
 
 const app = express();
 
+app.use(cors());
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
-app.use(cors());
+app.use(isValidUser)
 app.use(routes);
 
 const server = http.createServer(app)
