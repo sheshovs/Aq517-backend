@@ -3,35 +3,35 @@ import pg from "../../config/knex-config.js";
 const EventService = {
   createEvents: async (events) => {
     try {
-      return await pg("Event").insert(events).returning("*");
+      return await pg("aqviles.Event").insert(events).returning("*");
     } catch (error) {
       return error;
     }
   },
   deleteEvents: async (eventUuids) => {
     try {
-      return await pg("Event").whereIn("uuid", eventUuids).del();
+      return await pg("aqviles.Event").whereIn("uuid", eventUuids).del();
     } catch (error) {
       return error;
     }
   },
   getEvents: async () => {
     try {
-      return await pg("Event").select("*");
+      return await pg("aqviles.Event").select("*");
     } catch (error) {
       return error;
     }
   },
   getEventsByUUID: async (eventUuids) => {
     try {
-      return await pg("Event").whereIn("uuid", eventUuids).select("*");
+      return await pg("aqviles.Event").whereIn("uuid", eventUuids).select("*");
     } catch (error) {
       return error;
     }
   },
   updateEvents: async (eventUuids, updateData) => {
     try {
-      return await pg("Event")
+      return await pg("aqviles.Event")
         .whereIn("uuid", eventUuids)
         .update(updateData)
         .returning("*");
@@ -41,7 +41,7 @@ const EventService = {
   },
   getEventsByFilters: async (searchFilters) => {
     try {
-      return await pg("Event").where(searchFilters).select("*");
+      return await pg("aqviles.Event").where(searchFilters).select("*");
     } catch (error) {
       console.log(error);
       return error;
@@ -51,7 +51,7 @@ const EventService = {
     try {
       return await Promise.all(
         events.map(async (event) => {
-          const [eventExist] = await pg("Event")
+          const [eventExist] = await pg("aqviles.Event")
             .where(event)
             .select("*");
           return eventExist !== undefined
@@ -63,7 +63,7 @@ const EventService = {
   },
   getEventsByMonth: async (month) => {
     try {
-      return await pg("Event").whereRaw(`to_char("date", 'YYYY-MM') = '${month}'`).select("*");
+      return await pg("aqviles.Event").whereRaw(`to_char("date", 'YYYY-MM') = '${month}'`).select("*");
     } catch (error) {
       return error;
     }
