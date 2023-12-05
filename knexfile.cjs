@@ -20,6 +20,7 @@ module.exports = {
       user: DATABASE_USER,
       password: DATABASE_PASSWORD,
       database: DATABASE_NAME,
+      ssl: { rejectUnauthorized: false, require: true }
     },
     searchPath: [DATABASE_NAME],
     pool: {
