@@ -6,13 +6,15 @@ import AuthService from "./auth.service.js";
 const AuthController = {
   Login: async (req, res) => {
     const { email, password } = req.body;
-    const [user] = await AuthService.getUserByEmail(email)
+    let user = await AuthService.getUserByEmail(email)
 
-    if (!user) {
+    if (user.length === 0) {
       return res
         .status(StatusCodes.NOT_FOUND)
         .json({ message: "El correo electrónico no se encuentra registrado" });
     }
+
+    user = user[0]
 
     const passCorrect = await bcrypt.compare(password, user.password)
 
