@@ -13,11 +13,9 @@ const AuthController = {
         .status(StatusCodes.NOT_FOUND)
         .json({ message: "El correo electrónico no se encuentra registrado" });
     }
-    console.log(user)
 
     user = user[0]
     
-    console.log(user)
     const passCorrect = await bcrypt.compare(password, user.password)
 
     if (!passCorrect) {

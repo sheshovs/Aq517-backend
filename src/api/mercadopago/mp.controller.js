@@ -116,10 +116,8 @@ const MPController = {
       expirationDate: null,
     }
 
-    console.log(eventIds)
-
     const updatedEvents = await EventService.updateEvents(eventIds, updateData);
-    console.log(updatedEvents)
+
     if (updatedEvents.length !== eventIds.length) {
       return res
         .status(500)
