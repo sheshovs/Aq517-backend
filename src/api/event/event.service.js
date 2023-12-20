@@ -39,9 +39,9 @@ const EventService = {
       return error;
     }
   },
-  getEventsByFilters: async (searchFilters) => {
+  getEventsByFilters: async (date, room) => {
     try {
-      return await pg("aqviles.Event").where(searchFilters).select("*");
+      return await pg("aqviles.Event").where({room}).whereRaw('??::text LIKE ?', ['date', `${date}%`]).select("*");
     } catch (error) {
       console.log(error);
       return error;

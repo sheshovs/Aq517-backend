@@ -125,10 +125,7 @@ const EventController = {
         .json({ message: "No hay sala para buscar eventos" });
     }
 
-    const events = await EventService.getEventsByFilters({
-      date,
-      room,
-    });
+    const events = await EventService.getEventsByFilters(date, room);
 
     if (!events) {
       return res
