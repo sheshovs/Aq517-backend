@@ -63,8 +63,9 @@ const EventService = {
   },
   getEventsByMonth: async (month) => {
     try {
-      return await pg("aqviles.Event").whereRaw(`to_char("date", 'YYYY-MM') = '${month}'`).select("*");
+      return await pg("aqviles.Event").whereRaw('??::text LIKE ?', ['date', `${month}%`]).select("*");
     } catch (error) {
+      console.log(error);
       return error;
     }
   },
