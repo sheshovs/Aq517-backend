@@ -3,6 +3,7 @@ import EventController from "../event/event.controller.js";
 import MPController from "../mercadopago/mp.controller.js";
 import AuthController from "../auth/auth.controller.js";
 import OrderController from "../order/order.controller.js";
+import RoomController from "../room/room.controller.js";
 
 const router = express.Router();
 
@@ -17,5 +18,6 @@ router.route("/mercadopago/events/:preferenceId").delete(MPController.DeleteEven
 router.route('/auth/login').post(AuthController.Login);
 router.route('/auth/current').get(AuthController.CurrentUser);
 router.route('/orders').get(OrderController.GetOrders);
+router.route('/rooms').get(RoomController.GetRooms)
 
 export default router;

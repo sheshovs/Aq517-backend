@@ -112,20 +112,20 @@ const EventController = {
       .json({ message: "Eventos actualizados correctamente" });
   },
   GetEventsByFilters: async (req, res) => {
-    const { date, room } = req.query;
+    const { date, roomId } = req.query;
 
     if (!date) {
       return res
         .status(StatusCodes.BAD_REQUEST)
         .json({ message: "No hay fecha para buscar eventos" });
     }
-    if (!room) {
+    if (!roomId) {
       return res
         .status(StatusCodes.BAD_REQUEST)
         .json({ message: "No hay sala para buscar eventos" });
     }
 
-    const events = await EventService.getEventsByFilters(date, room);
+    const events = await EventService.getEventsByFilters(date, roomId);
 
     if (!events) {
       return res
