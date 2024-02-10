@@ -32,8 +32,10 @@ const MPController = {
       let total_price = 0
       let eventIds = []
       response.data.items.map((item) => {
-        total_price += item.unit_price
-        eventIds.push(item.id)
+        total_price += item.unit_price * item.quantity
+        if(item.id){
+          eventIds.push(item.id)
+        }
       })
 
       const payload = {
