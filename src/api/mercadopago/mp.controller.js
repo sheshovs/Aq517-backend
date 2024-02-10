@@ -9,7 +9,7 @@ const access_token = process.env.MP_ACCESS_TOKEN;
 
 const MPController = {
   CreatePreference: async (req, res) => {
-    const { attendant, email, phone, items } = req.body;
+    const { attendant, email, phone, items, paymentMethod } = req.body;
     const mercadoPagoUrl = `${mp_url}checkout/preferences?access_token=${access_token}`;
   
     const preferenceData = {
@@ -42,6 +42,7 @@ const MPController = {
         uuid: response.data.id,
         total_price,
         status: OrderStatuses.PENDING,
+        paymentMethod,
         attendant,
         email,
         phone,
