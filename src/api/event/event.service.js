@@ -3,7 +3,49 @@ import pg from "../../config/knex-config.js";
 const EventService = {
   createEvents: async (events) => {
     try {
-      return await pg("aqviles.Event").insert(events).returning("*");
+      const createdEvents = await Promise.all(
+        events.map(async event => {
+          const [createdEvent] = await pg("aqviles.Event").insert({
+            uuid: event.uuid,
+            title: event.title,
+            email: event.email,
+            phone: event.phone,
+            attendant: event.attendant,
+            date: event.date,
+            startTime: event.startTime,
+            endTime: event.endTime,
+            status: event.status,
+            expirationDate: event.expirationDate,
+            createdAt: event.createdAt,
+            roomId: event.roomId,
+          }).returning("*");
+          
+          const [room] = await pg("aqviles.Room").where("uuid", createdEvent.roomId);
+
+          const accesories = await Promise.all(
+            event.accesories.map(async (accesory) => {
+              const [createdAccesory] = await pg('aqviles.EventItem').insert({
+                eventId: createdEvent.uuid,
+                itemId: accesory.uuid,
+              }).returning("*");
+              return createdAccesory
+            })
+          )
+
+          if(accesories.length !== event.accesories.length) {
+            await pg("aqviles.Event").where("uuid", createdEvent.uuid).del();
+            return null;
+          }
+
+          delete createdEvent.roomId
+          return {
+            ...createdEvent,
+            room,
+            accesories: event.accesories,
+          }
+        })
+      )
+      return createdEvents
     } catch (error) {
       return error;
     }

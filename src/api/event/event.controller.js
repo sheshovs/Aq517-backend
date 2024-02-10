@@ -20,20 +20,23 @@ const EventController = {
     const createdAt = dayjs().format();
 
     const formattedEvents = events.map((event) => {
-      return {
+      const formattedEvent = {
         uuid: uuidv4(),
         ...event,
         status: EventStatuses.BLOCKED,
         expirationDate: dayjs(createdAt).add("10", "minutes").format(),
         createdAt,
-      };
+        roomId: event.room.uuid,
+      }
+      delete formattedEvent.room
+      return formattedEvent
     });
 
     const eventsToCheck = formattedEvents.map((event) => {
       return {
         date: event.date,
         startTime: event.startTime,
-        room: event.room,
+        roomId: event.roomId,
       };
     });
 
@@ -44,7 +47,6 @@ const EventController = {
         .status(StatusCodes.BAD_REQUEST)
         .json({ message: "Una o más horas ya se encuentran reservadas" });
     }
-
     const createdEvents = await EventService.createEvents(formattedEvents);
 
     if (createdEvents.length !== formattedEvents.length) {
