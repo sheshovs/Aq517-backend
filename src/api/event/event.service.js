@@ -105,7 +105,34 @@ const EventService = {
   },
   getEventsByMonth: async (month) => {
     try {
-      return await pg("aqviles.Event").whereRaw('??::text LIKE ?', ['date', `${month}%`]).select("*");
+      const events = await pg("aqviles.Event").whereRaw('??::text LIKE ?', ['date', `${month}%`]).select("*");
+      const eventsWithRoom = await Promise.all(
+        events.map(async (event) => {
+          const [room] = await pg("aqviles.Room").where("uuid", event.roomId);
+          delete event.roomId;
+          return {
+            ...event,
+            room,
+          }
+        })
+      )
+
+      const eventsWithAccesories = await Promise.all(
+        eventsWithRoom.map(async (event) => {
+          const accesoriesIds = await pg("aqviles.EventItem").where("eventId", event.uuid).select("*");
+          const accesories = await Promise.all(
+            accesoriesIds.map(async (accesory) => {
+              const [item] = await pg("aqviles.Item").where("uuid", accesory.itemId);
+              return item;
+            })
+          )
+          return {
+            ...event,
+            accesories,
+          }
+        })
+      )
+      return eventsWithAccesories;
     } catch (error) {
       console.log(error);
       return error;
