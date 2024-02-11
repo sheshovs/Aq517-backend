@@ -3,7 +3,7 @@ import pg from "../../config/knex-config.js";
 const RoomService = {
   getAllRooms: async () => {
     try {
-      const rooms = await pg("aqviles.Room").select("*");
+      const rooms = await pg("aqviles.Room").select("*").where("isActive", true);
 
       const roomWithItems = await Promise.all(
         rooms.map(async (room) => {
