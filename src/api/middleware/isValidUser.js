@@ -8,11 +8,14 @@ export default async (req, res, next) => {
     (req.method === 'POST' && req.url.includes("/auth/login")) ||
     (req.method === 'POST' && req.url.includes("/mercadopago/create_preference")) ||
     (req.method === 'POST' && req.url.includes("/mercadopago/events")) ||
+    (req.method === 'POST' && req.url.includes("/transbank/create_transaction")) ||
+    (req.method === 'POST' && req.url.includes("/transbank/confirm_transaction")) ||
     (req.method === 'PATCH' && req.url.includes("/events")) ||
     (req.method === 'DELETE' && req.url.includes("/block/events")) ||
     (req.method === 'DELETE' && req.url.includes("/mercadopago/events")) ||
     (req.method === 'GET' && req.url.includes("/events/filter")) ||
-    (req.method === 'GET' && req.url.includes("/rooms"))
+    (req.method === 'GET' && req.url.includes("/rooms")) ||
+    (req.method === 'GET' && req.url.includes("/order"))
   if (publicRoute) {
     next()
   } else {

@@ -16,6 +16,22 @@ const OrderController = {
     } catch (error) {
       return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json(error);
     }
+  },
+  GetOrder: async (req, res) => {
+    const { orderId } = req.params;
+    try {
+      const order = await OrderService.getOrder(orderId);
+
+      if (!order) {
+        return res
+          .status(StatusCodes.INTERNAL_SERVER_ERROR)
+          .json({ message: "Error obteniendo orden" });
+      }
+
+      return res.status(StatusCodes.OK).json(order);
+    } catch (error) {
+      return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json(error);
+    }
   }
 }
 

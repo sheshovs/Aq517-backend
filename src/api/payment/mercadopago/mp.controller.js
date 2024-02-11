@@ -1,11 +1,9 @@
 import axios from "axios";
-import MPService from "./mp.service.js";
-import { EventStatuses, OrderStatuses, mp_url } from "../utils/constants.js";
-import EventService from "../event/event.service.js";
+import { EventStatuses, OrderStatuses, mp_url } from "../../utils/constants.js";
+import EventService from "../../event/event.service.js";
+import OrderService from "../../order/order.service.js";
 
 const access_token = process.env.MP_ACCESS_TOKEN;
-
-
 
 const MPController = {
   CreatePreference: async (req, res) => {
@@ -16,9 +14,9 @@ const MPController = {
       items: items,
       auto_return: "approved",
       back_urls: {
-        success: `${process.env.APP_URL}/`,
-        failure: `${process.env.APP_URL}/`,
-        pending: `${process.env.APP_URL}/`,
+        success: `${process.env.APP_URL}/transaction/mp`,
+        failure: `${process.env.APP_URL}/transaction/mp`,
+        pending: `${process.env.APP_URL}/transaction/mp`,
       },
     };
   
@@ -49,13 +47,13 @@ const MPController = {
         createdAt: new Date(),
       }
       
-      const [createOrder] = await MPService.createOrder(payload)
+      const [createOrder] = await OrderService.createOrder(payload)
 
       if(!createOrder) {
         return res.status(400).json({ message: "Error creando orden" });
       }
 
-      const createOrderItems = await MPService.createOrderItems(eventIds, createOrder.uuid)
+      const createOrderItems = await OrderService.createOrderItems(eventIds, createOrder.uuid)
 
       if(!createOrderItems) {
         return res.status(400).json({ message: "Error creando items de orden" });
@@ -87,7 +85,7 @@ const MPController = {
       paymentId,
     }
 
-    const updateOrder = await MPService.updateOrder(preferenceId, orderPayload)
+    const updateOrder = await OrderService.updateOrder(preferenceId, orderPayload)
 
     if(!updateOrder) {
       return res.status(400).json({ message: "Error actualizando orden" });
@@ -97,7 +95,7 @@ const MPController = {
       return res.status(200).json({ message: "Pago en proceso" });
     }
 
-    const itemsByOrder = await MPService.getItemsByOrder(preferenceId)
+    const itemsByOrder = await OrderService.getItemsByOrder(preferenceId)
 
     if(!itemsByOrder) {
       return res.status(400).json({ message: "Error obteniendo items de la preferencia" });
@@ -141,13 +139,13 @@ const MPController = {
       status: status === "null" ? OrderStatuses.FAILURE : OrderStatuses.REJECTED,
     }
 
-    const updateOrder = await MPService.updateOrder(preferenceId, orderPayload)
+    const updateOrder = await OrderService.updateOrder(preferenceId, orderPayload)
 
     if(!updateOrder) {
       return res.status(400).json({ message: "Error actualizando orden" });
     }
 
-    const itemsByOrder = await MPService.getItemsByOrder(preferenceId)
+    const itemsByOrder = await OrderService.getItemsByOrder(preferenceId)
 
     if(!itemsByOrder) {
       return res.status(400).json({ message: "Error obteniendo items de la preferencia" });

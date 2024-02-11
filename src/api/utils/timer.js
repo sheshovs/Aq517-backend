@@ -2,8 +2,8 @@ import cron from "cron";
 import EventService from "../event/event.service.js";
 import { EventStatuses, OrderStatuses, mp_url } from "./constants.js";
 import { socketio, socketsUser } from "../../../index.js";
-import MPService from "../mercadopago/mp.service.js";
 import axios from "axios";
+import OrderService from "../order/order.service.js";
 
 const access_token = process.env.MP_ACCESS_TOKEN;
 
@@ -19,7 +19,7 @@ export const configurarTemporizador = (eventUuids, expirationDate) => {
       }
       const eventId = events[0].uuid;
 
-      const paymentIdByEventId = await MPService.getPaymentByEventId(eventId);
+      const paymentIdByEventId = await OrderService.getPaymentByEventId(eventId);
       const paymentId = paymentIdByEventId.paymentId;
 
       const mercadoPagoUrl = `${mp_url}v1/payments/${paymentId}?access_token=${access_token}`;
@@ -33,7 +33,7 @@ export const configurarTemporizador = (eventUuids, expirationDate) => {
         const status = response.data.status;
       
         if(status === "in_process") {
-          await MPService.updateOrder(paymentIdByEventId.uuid, { status: OrderStatuses.FAILURE });
+          await OrderService.updateOrder(paymentIdByEventId.uuid, { status: OrderStatuses.FAILURE });
         }
       } catch (error) {
         console.log(error);
