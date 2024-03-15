@@ -27,7 +27,7 @@ const TBController = {
     let returnUrl = `${process.env.APP_URL}/transaction/tb?orderId=${buyOrder}`;
 
     try {
-      const createResponse = await (new WebpayPlus().configureForProduction(commerceCode, apiKey).Transaction()).create(
+      const createResponse = await (new WebpayPlus.configureForProduction(commerceCode, apiKey).Transaction()).create(
         buyOrder,
         sessionId,
         amount,
@@ -70,7 +70,7 @@ const TBController = {
     const { token } = req.body;
 
     try {
-      const commitResponse = await (new WebpayPlus().configureForProduction(commerceCode, apiKey).Transaction()).commit(token);
+      const commitResponse = await (new WebpayPlus.configureForProduction(commerceCode, apiKey).Transaction()).commit(token);
       const orderId = commitResponse.buy_order
 
       const orderPayload = {}
