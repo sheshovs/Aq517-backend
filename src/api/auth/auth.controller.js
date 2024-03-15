@@ -11,7 +11,7 @@ const AuthController = {
     if (user.length === 0) {
       return res
         .status(StatusCodes.NOT_FOUND)
-        .json({ message: "El correo electrónico no se encuentra registrado" });
+        .json({ error: "El correo electrónico no se encuentra registrado" });
     }
 
     user = user[0]
