@@ -1,5 +1,5 @@
 import transbank from 'transbank-sdk'; // ES6 Modules
-const { WebpayPlus } = transbank
+const { WebpayPlus, Options } = transbank
 import OrderService from '../../order/order.service.js';
 import { EventStatuses, OrderStatuses } from '../../utils/constants.js';
 import EventService from '../../event/event.service.js';
@@ -27,7 +27,7 @@ const TBController = {
     let returnUrl = `${process.env.APP_URL}/transaction/tb?orderId=${buyOrder}`;
 
     try {
-      const createResponse = await (new WebpayPlus.configureForProduction(commerceCode, apiKey).Transaction()).create(
+      const createResponse = await (new WebpayPlus.Transaction(new Options(commerceCode, apiKey))).create(
         buyOrder,
         sessionId,
         amount,
@@ -70,7 +70,7 @@ const TBController = {
     const { token } = req.body;
 
     try {
-      const commitResponse = await (new WebpayPlus.configureForProduction(commerceCode, apiKey).Transaction()).commit(token);
+      const commitResponse = await (new WebpayPlus.Transaction(new Options(commerceCode, apiKey))).commit(token);
       const orderId = commitResponse.buy_order
 
       const orderPayload = {}
