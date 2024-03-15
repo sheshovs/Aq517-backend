@@ -27,6 +27,7 @@ router.route('/auth/current').get(AuthController.CurrentUser);
 // Orders
 router.route('/orders').get(OrderController.GetOrders);
 router.route('/order/:orderId').get(OrderController.GetOrder);
+router.route('/orderWithEvents').post(OrderController.CreateOrderWithEvents);
 // Rooms
 router.route('/rooms').get(RoomController.GetRooms)
 
