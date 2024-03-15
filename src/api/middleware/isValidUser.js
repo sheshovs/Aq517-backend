@@ -15,7 +15,7 @@ export default async (req, res, next) => {
     (req.method === 'DELETE' && req.url.includes("/mercadopago/events")) ||
     (req.method === 'GET' && req.url.includes("/events/filter")) ||
     (req.method === 'GET' && req.url.includes("/rooms")) ||
-    (req.method === 'GET' && req.url.includes("/order"))
+    (req.method === 'GET' && req.url.includes("/order/"))
   if (publicRoute) {
     next()
   } else {
