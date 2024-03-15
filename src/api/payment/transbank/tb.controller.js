@@ -5,6 +5,13 @@ import { EventStatuses, OrderStatuses } from '../../utils/constants.js';
 import EventService from '../../event/event.service.js';
 import { socketio, socketsUser } from '../../../../index.js';
 
+const WebpayPlusProduction = new WebpayPlus
+
+const commerceCode = process.env.TBK_API_KEY_ID
+const apiKey = process.env.TBK_API_KEY_SECRET
+
+WebpayPlusProduction.configureForProduction(commerceCode, apiKey)
+
 const TBController = {
   CreateTransaction: async (req, res) => {
     const { items, paymentMethod, attendant, email, phone } = req.body;
@@ -24,7 +31,7 @@ const TBController = {
     let returnUrl = `${process.env.APP_URL}/transaction/tb?orderId=${buyOrder}`;
 
     try {
-      const createResponse = await (new WebpayPlus.Transaction()).create(
+      const createResponse = await WebpayPlusProduction.Transaction().create(
         buyOrder,
         sessionId,
         amount,
@@ -67,7 +74,7 @@ const TBController = {
     const { token } = req.body;
 
     try {
-      const commitResponse = await (new WebpayPlus.Transaction()).commit(token);
+      const commitResponse = await WebpayPlusProduction.Transaction().commit(token);
       const orderId = commitResponse.buy_order
 
       const orderPayload = {}
