@@ -1,4 +1,5 @@
-import Transbank from 'transbank-sdk'; // ES6 Modules
+import transbank from 'transbank-sdk'; // ES6 Modules
+const { WebpayPlus, Environment } = transbank;
 import OrderService from '../../order/order.service.js';
 import { EventStatuses, OrderStatuses } from '../../utils/constants.js';
 import EventService from '../../event/event.service.js';
@@ -8,12 +9,13 @@ const commerceCode = process.env.TBK_API_KEY_ID
 const apiKey = process.env.TBK_API_KEY_SECRET
 
 // Configura el ambiente de producción
-let configuration = new Transbank.Configuration();
-configuration.environment = Transbank.Environment.Production;
-configuration.commerceCode = commerceCode;
-configuration.apiKey = apiKey;
+const configuration = {
+  environment: Environment.Production,
+  commerceCode,
+  apiKey
+}
 
-const WebpayPlus = new Transbank.WebpayPlus(configuration)
+const webpayPlusTransaction = new WebpayPlus.Transaction(configuration);
 
 const TBController = {
   CreateTransaction: async (req, res) => {
@@ -34,7 +36,7 @@ const TBController = {
     let returnUrl = `${process.env.APP_URL}/transaction/tb?orderId=${buyOrder}`;
 
     try {
-      const createResponse = await WebpayPlus.Transaction().create(
+      const createResponse = await webpayPlusTransaction.create(
         buyOrder,
         sessionId,
         amount,
@@ -77,7 +79,7 @@ const TBController = {
     const { token } = req.body;
 
     try {
-      const commitResponse = await WebpayPlus.Transaction().commit(token);
+      const commitResponse = await webpayPlusTransaction.commit(token);
       const orderId = commitResponse.buy_order
 
       const orderPayload = {}
